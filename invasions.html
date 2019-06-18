@@ -1,0 +1,126 @@
+<head>
+<style>
+    td {
+        text-align: center;
+        font-family: 'impress_btregular';
+        font-size: 32px;
+        color: #FBC64A;
+        padding: 1%;
+        text-shadow: 2px 2px #000000;
+        background-color: rgb(28,119,255);
+        border-color: rgb(28,119,255);
+        }
+        
+    .specialTable {
+        background-color: rgba(44, 107, 165,0.9); 
+        text-align: center;
+        border: 2px solid #FBC64A;
+    }       
+</style>  
+</head>
+<!-- <body onload="getAPI()"> -->
+
+        <script>
+            const URL = 'https://corporateclash.net/api/v1/districts.js';
+            function getAPI() {
+                fetch(URL).then((response) => response.json()).then(data => {
+                    // WEB ELEMENTS
+                    var table = document.getElementById("invasions");
+                    var tr = document.createElement("tr");
+                    var td = document.createElement("td");
+                    table.appendChild(tr);
+                    // DATA FROM API
+                    
+                    var totalPopulation = 0;
+                    var numberOfInvasions = 0;
+                    var numInvasionsDisplay = 0;
+                    var invasionInfo = "";
+                    var attackingCog = "";
+                    var invNumber = 0;
+                    /*
+                        INTERATING OVER EACH DISTRICT TO GET DATA
+                        AND STORE IT IN VARIABLES ABOVE
+                    */
+                    data.forEach(elt => {
+    
+                         if (elt.online && elt.invasion_online) {
+                             numInvasionsDisplay++;
+                         }
+                        
+                        totalPopulation += elt.population;
+                        if (elt.online && elt.invasion_online) {                      
+                            // checking for mobile device to format the table
+                            if (screen.width > 768) {
+                                if (numberOfInvasions % 3 == 0) {
+                                    tr = document.createElement("tr");
+                                    table.appendChild(tr);
+                                }
+                            } else if (screen.width >= 481 && screen.width <= 768) {
+                                if (numberOfInvasions % 2 == 0) {
+                                    tr = document.createElement("tr");
+                                    table.appendChild(tr);
+                                }
+                            }  else {
+                                tr = document.createElement("tr");
+                                table.appendChild(tr);
+                            }
+
+                            attackingCog = elt.cogs_attacking;
+                            invNumber++;
+                            
+                            invasionInfo =
+                            "<div id='cogStyleMe" + invNumber + "' style= background-image: url(./images/" + attackingCog + ".png);> <h2 style='color: white;'>" + elt.cogs_attacking + "</h2>" +
+                            "<p>" + elt.name + "</p>" +
+                            "<p>" + (elt.count_total - elt.count_defeated) + "/" + elt.count_total + " cogs left </p>" +
+                            "<p>" + (Number.parseInt(elt.remaining_time/60)) + ":";
+    
+                            // Code that formats the time remaining to proper minutes:seconds notation
+                             var seconds = elt.remaining_time % 60;
+                             if (seconds >= 10) {
+                                 invasionInfo += seconds + " remaining </div>";
+                             } else {
+                                 invasionInfo += "0" + seconds + " remaining </div>";
+                             }
+                            
+                            
+                            numberOfInvasions+= 2;
+                            
+                            td = document.createElement("td");
+                            td.innerHTML = invasionInfo;
+                            tr.appendChild(td);
+
+                            var cogStyle = document.getElementById("cogStyleMe" + invNumber);
+                            cogStyle.style.backgroundImage = "url('./images/Cogs/" + attackingCog + ".png')";
+                        }
+                    });
+                    if (numberOfInvasions == 0) {
+                        invasionInfo = "There are currently no active invasions.";
+                        tr = document.createElement("tr");
+                        table.appendChild(tr);
+                        td = document.createElement("td");
+                        td.appendChild(document.createTextNode(invasionInfo));
+                        tr.appendChild(td);
+                    }
+    
+                    document.getElementById("currentPopulation").innerHTML = "Toontown Population: " + totalPopulation;
+                    document.getElementById("numInvasions").innerHTML = "Current Invasions: " + numInvasionsDisplay;
+                });
+            }
+    
+        </script>
+        <br/>
+            <table style="width: 100%">
+                    <tr>
+                        <th>
+                            <h2 class="h2" id="numInvasions"></h2>
+                        </th>
+                        <th>
+                            <p></p>
+                        </th>
+                        <th>
+                            <h2 class="h2" id="currentPopulation"></h2>
+                        </th>
+                    </tr>
+            </table>
+        
+        <!-- </body> -->
